@@ -1,0 +1,121 @@
+﻿<div id="tableBlock">
+    <div v-if="serverData.length">
+        <table>
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Имя</th>
+                    <th>Фамилия</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in serverData">
+                    <td>{{item.Id}}</td>
+                    <td>{{item.FirstName}}</td>
+                    <td>{{item.SecondName}}</td>
+                    <td><button v-on:click="edit(item);">Редактировать</button><button v-on:click="delete(item.Id)">Удалить</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <p><b>Редактированиие человека</b></p>
+        <table>
+            <tr><td><input type="hidden" v-model="editData.Id" /></td><td></td></tr>
+            <tr><td><label>Имя: </label></td><td><input type="text" v-model="editData.FirstName" /></td></tr>
+            <tr><td><label>Фамилия: </label></td><td><input type="text" v-model="editData.SecondName" /></td></tr>
+        </table>
+        <button v-on:click="update(editData)">Сохранить</button>
+    </div>
+
+    <div>
+        <p><b>Добавление пользователя</b></p>
+        <table>
+            <tr><td><label>Имя: </label></td><td><input type="text" id="addFirstName" /></td></tr>
+            <tr><td><label>Фамилия: </label></td><td><input type="text" id="addSecondName" /></td></tr>
+        </table>
+        <button id="addHuman">Сохранить</button>
+    </div>
+</div>
+
+<script src="https://unpkg.com/vue"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+
+<script>
+    var v = new Vue({
+        el: '#tableBlock',
+        created: function () { //ready()
+            //console.log("ready");
+            
+            this.loadData();
+        },
+        data: {
+            message: 'Hello Vue.js!',
+            serverData: null,
+            editData: {
+                Id: null,
+                FirstName: null,
+                SecondName: null
+            }
+        },
+        methods: {
+            loadData: function () {
+                const that = this;
+                //console.log("hello");
+                //alert("alert");
+
+                $.ajax({
+                    contentType: "application/json",
+                    dataType: "json",
+                    url:  "http://localhost:50087/api/TestClasses", 
+                    method: "GET",
+                    success: function (response) {
+                        console.log(response);
+                        that.$data.serverData = response; //почему так? потому что айяк запрос не работает с this
+                  
+                    },
+                    error: function () {
+                        console.log("Oops");
+                    }
+                });
+            },
+            edit: function (item) {
+                this.$data.editData.FirstName = item.FirstName;
+                this.$data.editData.SecondName = item.SecondName;
+                this.$data.editData.Id = item.Id;
+            },
+            update: function (editData) {
+                $.ajax({
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(editData),
+                    url: "http://localhost:50087/api/TestClasses/" + editData.Id,
+                    method: "PUT",
+                    success: function (response) {
+                        console.log(response);
+                    },
+                    error: function () {
+                        console.log("Oops");
+                    }
+                });
+            },
+            delete: function (id) {
+                $.ajax({
+                    contentType: "application/json",
+                    dataType: "json",
+                    url: "http://localhost:50087/api/TestClasses/" + id,
+                    method: "DELETE",
+                    success: function (response) {
+                        console.log(response);
+                    },
+                    error: function () {
+                        console.log("Oops");
+                    }
+                });
+            }
+        }
+    })
+</script>
