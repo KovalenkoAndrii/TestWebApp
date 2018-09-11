@@ -14,7 +14,7 @@
                     <td>{{item.Id}}</td>
                     <td>{{item.FirstName}}</td>
                     <td>{{item.SecondName}}</td>
-                    <td><button v-on:click="edit(item);">Редактировать</button><button v-on:click="delete(item.Id)">Удалить</button></td>
+                    <td><button v-on:click="edit(item);">Редактировать</button><button v-on:click="deleteItem(item.Id)">Удалить</button></td>
                 </tr>
             </tbody>
         </table>
@@ -33,10 +33,11 @@
     <div>
         <p><b>Добавление пользователя</b></p>
         <table>
-            <tr><td><label>Имя: </label></td><td><input type="text" id="addFirstName" /></td></tr>
-            <tr><td><label>Фамилия: </label></td><td><input type="text" id="addSecondName" /></td></tr>
+            <tr><td><label>Id: </label></td><td><input type="text" v-model="createData.Id" /></td></tr>
+            <tr><td><label>Имя: </label></td><td><input type="text" v-model="createData.FirstName" /></td></tr>
+            <tr><td><label>Фамилия: </label></td><td><input type="text" v-model="createData.SecondName" /></td></tr>
         </table>
-        <button id="addHuman">Сохранить</button>
+        <button v-on:click="create(createData)">Сохранить</button>
     </div>
 </div>
 
@@ -59,6 +60,11 @@
                 Id: null,
                 FirstName: null,
                 SecondName: null
+            },
+            createData: {
+                Id: null,
+                FirstName: null,
+                SecondName: null
             }
         },
         methods: {
@@ -67,7 +73,7 @@
                 //console.log("hello");
                 //alert("alert");
 
-                $.ajax({
+                $.ajax({                    
                     contentType: "application/json",
                     dataType: "json",
                     url:  "http://localhost:50087/api/TestClasses", 
@@ -82,7 +88,7 @@
                     }
                 });
             },
-            edit: function (item) {
+            edit: function (item) {         
                 this.$data.editData.FirstName = item.FirstName;
                 this.$data.editData.SecondName = item.SecondName;
                 this.$data.editData.Id = item.Id;
@@ -102,7 +108,22 @@
                     }
                 });
             },
-            delete: function (id) {
+            create: function (createData) {
+                $.ajax({
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(createData),
+                    url: "http://localhost:50087/api/TestClasses/",
+                    method: "POST",
+                    success: function (response) {
+                        console.log(response);
+                    },
+                    error: function () {
+                        console.log("Oops");
+                    }
+                });
+            },
+            deleteItem: function (id) {
                 $.ajax({
                     contentType: "application/json",
                     dataType: "json",
